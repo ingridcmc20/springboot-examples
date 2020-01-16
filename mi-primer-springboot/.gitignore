@@ -1,5 +1,7 @@
-!HELP.md
-!.gitignore
-!pom.xml
-!/src/*
-
+.mvn
+.settings
+target
+.claspath
+.project
+mvnw
+mvnw.cmd
