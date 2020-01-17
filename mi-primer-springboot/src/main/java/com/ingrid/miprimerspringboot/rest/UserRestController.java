@@ -18,11 +18,12 @@ import com.ingrid.miprimerspringboot.modelo.User;
 import com.ingrid.miprimerspringboot.service.UserService;
 
 @RestController
+@RequestMapping(value = "/user")
 public class UserRestController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/user/", method = RequestMethod.GET)
+	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ResponseEntity<List<User>> listAllUsers() {
 		List<User> users = userService.findAllUsers();
 		if (users.isEmpty()) {
@@ -31,7 +32,7 @@ public class UserRestController {
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> getUser(@PathVariable("id") long id) {
 		User user = userService.findById(id);
 		if (user == null) {
@@ -40,7 +41,7 @@ public class UserRestController {
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/user/", method = RequestMethod.POST)
+	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
 		if (userService.isUserExist(user)) {
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
@@ -50,5 +51,42 @@ public class UserRestController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
 		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+		User currentUser = userService.findById(id);
+
+		if (currentUser == null) {
+			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+		}
+
+		currentUser.setUsername(user.getUsername());
+		currentUser.setAddress(user.getAddress());
+		currentUser.setEmail(user.getEmail());
+
+		userService.updateUser(currentUser);
+
+		return new ResponseEntity<User>(currentUser, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<User> deleteUser(@PathVariable("id") long id) {
+		User user = userService.findById(id);
+
+		if (user == null) {
+			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+		}
+
+		userService.deleteUserById(id);
+
+		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
+	}
+
+	@RequestMapping(value = "/", method = RequestMethod.DELETE)
+	public ResponseEntity<User> deleteAllUsers() {
+		userService.deleteAllUsers();
+
+		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
 	}
 }

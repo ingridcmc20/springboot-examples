@@ -1,6 +1,7 @@
 package com.ingrid.miprimerspringboot.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,14 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-	private static List<User> users;
+//	private static List<User> users;
 
 	@Override
 	public User findById(long id) {
 		// TODO Auto-generated method stub
-		return null;
+		Optional<User> optionalUser = userRepository.findById(id);
+
+		return optionalUser.get();
 	}
 
 	public User findByName(String name) {
